@@ -24,5 +24,5 @@ const userSchema = new mongoose.Schema({
   }
 })
 
-// Create a mongoDB collection called User, using userSchema defined above
+// Create a mongoDB collection called "User", using userSchema defined above
 module.exports = User = mongoose.model('User', userSchema)
