@@ -16,7 +16,7 @@ const profileSchema = new mongoose.Schema({
   },
   status:{
     type: String,
-    required = true
+    required: true
   },
   skills:{
     type: [String]
@@ -40,7 +40,7 @@ const profileSchema = new mongoose.Schema({
       },
       from:{
         type: Date,
-        required = true
+        required: true
       },
       to:{
         type: Date,
@@ -58,7 +58,7 @@ const profileSchema = new mongoose.Schema({
     {
       school:{
         type: String,
-        required = true
+        required: true
       },
       degree:{
         type: String
