@@ -3,20 +3,21 @@ const express = require('express')
 const router = express.Router()
 const { check, validationResult } = require('express-validator')
 
-const auth = require('../../middleware/auth') //middleware
+const auth = require('../../middleware/auth') //import middleware
 
-// database collections(tables)
+// import database collections(tables)
 const Profile = require('../../models/Profile')
 const User = require('../../models/Users')
 
-// @route request type:GET, endpoint:api/profile/me
-// @description: send user's profile to client-side
+
+// @route GET api/profile/me
+// @desc: send current user's profile to client-side
 // @access: private
 router.get('/me', auth, async (req, res) => {
   try {
     // find user's profile in "Profile" DB collection according to his ID, and use "populate" to add "name" and "avatar" field in "user" DB collection
-    const profile = await Profile.findOne({ user: req.user.id}).populate(
-      'user',
+    const profile = await Profile.findOne({ user: req.user.id }).populate(
+      'User',
       ['name','avatar']
     )
 
@@ -28,13 +29,13 @@ router.get('/me', auth, async (req, res) => {
 
   } catch (err) {
     console.error(err.message)
-    res.statusCode(500).json({ msg:'server error' })
+    res.status(500).send('server error')
   }
 })
 
 
-// @route request type:POST, endpoint:api/profile
-// @description: add or update user's profile'
+// @route POST api/profile
+// @desc: create or update user's profile'
 // @access: private
 router.post(
   '/',
@@ -68,6 +69,8 @@ router.post(
 
     // build profile object
     const profileFields = {}
+    profileFields.user = req.user.id
+
     if(company) profileFields.company = company
     if(website) profileFields.website = website
     if(location) profileFields.location = location
@@ -92,15 +95,15 @@ router.post(
 
       // if there is a profile, update it
       if(profile){
+        //console.log('found profile');
         profile = await Profile.findOneAndUpdate(
           { user: req.user.id },
-          { $set: profileFields },
+          { $set: profileFields },// update this profile to "profileFields"
           { new: true }//if true, return the modified document rather than the original.
         )
         return res.json(profile)
       }
-      
-
+      //console.log('found no profile');
       // if there is no profile, create one
       profile = new Profile(profileFields)
       await profile.save()
@@ -110,11 +113,139 @@ router.post(
       console.error(err.message)
       res.status(500).json({ msg:'server error' })
     }
-
-
-
-
   }
 )
+
+
+// @route    GET api/profile
+// @desc     get all profiles
+// @access   public
+router.get('/', async (req, res) => {
+  try {
+    const profile = await Profile.find().populate('User', ['name', 'avatar'])
+    res.json(profile)
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).json({ msg:'server error' })
+  }
+})
+
+
+// @route    GET api/profile/user/:user_id
+// @desc     get profile by userID
+// @access   public
+router.get('/user/:user_id', async (req, res) => {
+  try {
+    const profile = await Profile.findOne(
+      { user: req.params.user_id } // use "req.params.user_id" to access params in URL
+    ).populate('User', ['name', 'avatar'])
+
+    if(!profile) return res.status(400).json({ msg:'Profile not found'})
+
+    res.json(profile)
+  } catch (err) {
+    console.error(err.message)
+    if(err.kind == 'ObjectId'){
+      return res.status(400).json({ msg:'Profile not found' })
+    }
+    res.status(500).json({ msg:'server error' })
+  }
+})
+
+
+// @route    DELETE api/profile
+// @desc     delete a user, his posts & profiles
+// @access   private
+router.delete('/', auth, async (req, res) => {
+  try {
+    // todo: remove user's posts
+
+    // remove user and his profile
+    await Profile.findOneAndDelete({ user: req.user.id })
+    await User.findOneAndDelete({ _id: req.user.id })
+    res.json({ msg:"user deleted" })
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).json({ msg:'server error' })
+  }
+})
+
+
+// @route    PUT api/experience
+// @desc     update experience
+// @access   private
+router.put('/experience', 
+  [
+    auth, 
+    [  // the 2nd middleware
+      check('title','title is required').not().isEmpty(),
+      check('company','company is required').not().isEmpty(),
+      check('from','from is required').not().isEmpty(),
+    ]
+  ], 
+  async (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  // destructure the data that user submit
+  const {
+    title,
+    company,
+    location,
+    from,
+    to,
+    current,
+    description
+  } = req.body
+
+  const newExp = {
+    title,
+    company,
+    location,
+    from,
+    to,
+    current,
+    description
+  }
+  
+  try {
+    const profile = await Profile.findOne({ user: req.user.id })
+    
+    profile.experience.unshift(newExp) //put newExp in the front of profile.experience (profile.experience is an array)
+    
+    await profile.save()
+
+    res.json(profile)
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).json({ msg:'server error' })
+  }
+})
+
+
+// @route    DELETE api/experience/:exp_id
+// @desc     delete experience according to exp_id
+// @access   private
+router.delete('/experience/:exp_id', auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id })
+
+    // get the to-be-removed experience index, according to exp_id
+    const removeIndex = profile.experience.map(item => item.id).indexOf(req.params.exp_id)
+
+    // splice(index,1) remove 1 element starting from the given index
+    profile.experience.splice(removeIndex, 1)
+
+    await profile.save()
+
+    res.json(profile)
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).json({ msg:'server error' })
+  }
+})
+
 
 module.exports = router
