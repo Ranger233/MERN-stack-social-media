@@ -8,9 +8,9 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('config')
 
-// @route request type:GET, endpoint:api/auth
-// @description: Test route
-// @access: public
+// @route    GET  api/auth
+// @desc     get user info
+// @access   private
 
 // The second argument "auth" is a middleware used to validate users token
 // By adding this middleware, this route is now protected(only the user who has correct token can access it)
@@ -28,9 +28,9 @@ router.get('/', auth, async(req, res) => {
 })
 
 
-// @route request type: POST, endpoint:api/users
-// @desc: log in users. If the password is right, return a token, so the user can access protected route with his token
-// @access: public
+// @route   POST  api/users
+// @desc    log in users. If the password is right, return a token, so the user can access protected route with his token
+// @access  public
 router.post('/',
   [ // Use express-validator to check input
     check('email', 'Please enter a valid email address')
