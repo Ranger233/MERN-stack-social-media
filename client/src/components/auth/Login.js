@@ -1,7 +1,10 @@
 import React, { Fragment, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { login } from '../../actions/auth'
 
-const Login = () => {
+const Login = ({ login, isAuthenticated }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -18,7 +21,12 @@ const Login = () => {
   // when submit button is clicked
   const onSubmit = event => {
     event.preventDefault() // prevent refresh
-    console.log(formData);
+    login(email, password) // call login action defined in redux src/actions/auth
+  }
+
+  // if logged in, redirect to dashboard
+  if(isAuthenticated){
+    return <Redirect to='/dashboard'/>
   }
 
   return (
@@ -53,4 +61,19 @@ const Login = () => {
   )
 }
 
-export default Login
+// This code declares which type the props are in 
+// eg, props "login" is a function, and it's required. "isAuthenticated" is a boolean
+Login.propTypes = {
+  login: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool,
+}
+
+const mapStateToProps = state => ({ 
+  // we can use 'mapStateToProps' function to access redux state in react component
+  // we can assign states to props like
+  // props: state
+  isAuthenticated: state.auth.isAuthenticated
+})
+
+// to make 'mapStateToProps' works, it has to be put into connect as the 1st param
+export default connect(mapStateToProps, {login})(Login)

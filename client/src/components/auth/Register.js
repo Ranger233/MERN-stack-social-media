@@ -1,11 +1,11 @@
 import React, { Fragment, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux' // connect react to redux
 import { setAlert } from '../../actions/alert'
 import { register } from '../../actions/auth'
 import PropTypes from 'prop-types' // shortcut: write "impt" to generate
 
-const Register = ({ setAlert, register }) => {
+const Register = ({ setAlert, register, isAuthenticated }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,6 +29,11 @@ const Register = ({ setAlert, register }) => {
     } else {
       register({ name, email, password })
     }
+  }
+
+  // if logged in, redirect to dashboard
+  if(isAuthenticated){
+    return <Redirect to='/dashboard'/>
   }
 
   return (
@@ -88,15 +93,22 @@ const Register = ({ setAlert, register }) => {
   )
 }
 
+// This code declares which type the props of the React component "Register" are in 
+// eg, props "setAlert" is a function, and it's required
 Register.propTypes = {
   setAlert: PropTypes.func.isRequired, // shortcut: write "ptfr" to generate
   register: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool,
 }
+
+const mapStateToProps = state => ({ 
+  isAuthenticated: state.auth.isAuthenticated
+})
 
 // to connect react to redux, write "export default connect()(Register)" 
 // instead of "export default Register"
 // because connect() allows us to access setAlert by "props.setAlert"
 export default connect(
-  null, 
+  mapStateToProps, 
   { setAlert, register }
 )(Register)
