@@ -2,9 +2,10 @@ import React, { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux' // connect react to redux
 import { setAlert } from '../../actions/alert'
+import { register } from '../../actions/auth'
 import PropTypes from 'prop-types' // shortcut: write "impt" to generate
 
-const Register = ({ setAlert }) => {
+const Register = ({ setAlert, register }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,7 +27,7 @@ const Register = ({ setAlert }) => {
     if(password !== password2){
       setAlert('passwords do not match', 'danger');
     } else {
-      console.log(formData);
+      register({ name, email, password })
     }
   }
 
@@ -42,7 +43,8 @@ const Register = ({ setAlert }) => {
             type="text" 
             placeholder="Name" 
             name="name" 
-          required />
+            required
+          />
         </div>
         <div className="form-group">
           <input 
@@ -50,10 +52,12 @@ const Register = ({ setAlert }) => {
             onChange={event => onChange(event)} 
             type="email" 
             placeholder="Email Address" 
-            name="email" />
-          <small className="form-text"
-            >This site uses Gravatar so if you want a profile image, use a
-            Gravatar email</small>
+            name="email" 
+          />
+          <small className="form-text">
+            This site uses Gravatar so if you want a profile image, use a
+            Gravatar email
+          </small>
         </div>
         <div className="form-group">
           <input
@@ -86,9 +90,13 @@ const Register = ({ setAlert }) => {
 
 Register.propTypes = {
   setAlert: PropTypes.func.isRequired, // shortcut: write "ptfr" to generate
+  register: PropTypes.func.isRequired,
 }
 
 // to connect react to redux, write "export default connect()(Register)" 
 // instead of "export default Register"
 // because connect() allows us to access setAlert by "props.setAlert"
-export default connect(null, { setAlert })(Register)
+export default connect(
+  null, 
+  { setAlert, register }
+)(Register)
