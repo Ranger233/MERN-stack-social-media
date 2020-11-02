@@ -68,6 +68,12 @@ Login.propTypes = {
   isAuthenticated: PropTypes.bool,
 }
 
+
+// Your mapStateToProps function should return a plain object that contains the data the component needs:
+// Each field in the object will become a prop for your actual component
+// The values in the fields will be used to determine if your component needs to re-render
+// It receives the entire store state, and should return an object of data this component needs.
+// detailed tutorial: https://react-redux.js.org/introduction/quick-start
 const mapStateToProps = state => ({ 
   // we can use 'mapStateToProps' function to access redux state in react component
   // we can assign states to props like
@@ -75,5 +81,5 @@ const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated
 })
 
-// to make 'mapStateToProps' works, it has to be put into connect as the 1st param
+//'React Redux' provides a connect function for you to connect your component to the store.
 export default connect(mapStateToProps, {login})(Login)
