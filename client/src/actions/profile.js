@@ -38,7 +38,7 @@ export const createProfile = (formData, history, edit = false) => async dispatch
 
     dispatch(setAlert( edit? 'Profile updated' : 'Profile created', 'success'))
 
-    // if editing profile, do not redirect. if creating, redirect
+    // if editing profile, do not redirect. if creating profile, redirect to dashboard
     if(!edit){
       history.push('/dashboard')
     }

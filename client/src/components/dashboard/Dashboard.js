@@ -4,9 +4,9 @@ import React, { useEffect, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { getCurrentProfile } from '../../actions/profile'
-import Spinner from '../layout/Spinner'
 import { Link } from 'react-router-dom'
-
+import Spinner from '../layout/Spinner'
+import DashboardActions from './DashboardActions'
 
 const Dashboard = ({ 
   getCurrentProfile, 
@@ -33,7 +33,9 @@ const Dashboard = ({
         </Link>
       </Fragment> 
       :  
-      <Fragment>You have a profile now</Fragment> }
+      <Fragment>
+        <DashboardActions />
+      </Fragment> }
   </Fragment>
 }
 
