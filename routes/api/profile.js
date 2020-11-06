@@ -8,7 +8,7 @@ const auth = require('../../middleware/auth') //import middleware
 // import database collections(tables)
 const Profile = require('../../models/Profile')
 const User = require('../../models/Users')
-
+const Post = require('../../models/Posts')
 
 // @route    GET api/profile/me
 // @desc     send current user's profile to client-side
@@ -78,7 +78,9 @@ router.post(
     if(status) profileFields.status = status
     if(githubusername) profileFields.githubusername = githubusername
     if(skills) {
-      profileFields.skills = skills.split(',').map(skill => skill.trim())
+      profileFields.skills = Array.isArray(skills)
+      ? skills
+      : skills.split(',').map((skill) => ' ' + skill.trim())
     }
 
     //build social object
@@ -122,7 +124,7 @@ router.post(
 // @access   public
 router.get('/', async (req, res) => {
   try {
-    const profile = await Profile.find().populate('User', ['name', 'avatar'])
+    const profile = await Profile.find().populate('user', ['name', 'avatar'])
     res.json(profile)
   } catch (err) {
     console.error(err.message)
@@ -138,7 +140,7 @@ router.get('/user/:user_id', async (req, res) => {
   try {
     const profile = await Profile.findOne(
       { user: req.params.user_id } // use "req.params.user_id" to access params in URL
-    ).populate('User', ['name', 'avatar'])
+    ).populate('user', ['name', 'avatar'])
 
     if(!profile) return res.status(400).json({ msg:'Profile not found'})
 
@@ -158,11 +160,12 @@ router.get('/user/:user_id', async (req, res) => {
 // @access   private
 router.delete('/', auth, async (req, res) => {
   try {
-    // todo: remove user's posts
-
+    // remove user's posts
+    await Post.deleteMany({ user: req.user.id })
     // remove user and his profile
     await Profile.findOneAndDelete({ user: req.user.id })
     await User.findOneAndDelete({ _id: req.user.id })
+    
     res.json({ msg:"user deleted" })
   } catch (err) {
     console.error(err.message)
