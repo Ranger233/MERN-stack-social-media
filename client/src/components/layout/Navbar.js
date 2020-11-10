@@ -10,23 +10,28 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   // #! means the link will go no where
   const authLinks = (
     <ul>
-        <li>
-          <Link to="/profiles">
-            See user profiles
-          </Link>
-        </li>
-        <li>
-          <Link to="/dashboard">
-            <i className="fas fa-user"></i>{' '}
-            <span className="hide-sm">Dashboard</span>
-          </Link>
-        </li>
-        <li>
-          <a onClick={ logout } href="#!"> 
-            <i className="fas fa-sign-out-alt"></i>{' '}
-            <span className="hide-sm">Log out</span>
-          </a>
-        </li>
+      <li>
+        <Link to="/posts">
+          Posts
+        </Link>
+      </li>
+      <li>
+        <Link to="/profiles">
+          See user profiles
+        </Link>
+      </li>
+      <li>
+        <Link to="/dashboard">
+          <i className="fas fa-user"></i>{' '}
+          <span className="hide-sm">Dashboard</span>
+        </Link>
+      </li>
+      <li>
+        <a onClick={ logout } href="#!"> 
+          <i className="fas fa-sign-out-alt"></i>{' '}
+          <span className="hide-sm">Log out</span>
+        </a>
+      </li>
     </ul>
   )
 
