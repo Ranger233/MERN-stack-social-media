@@ -1,8 +1,8 @@
 /* Global Styles */
 :root {
-  --primary-color: #17a2b8;
-  --dark-color: #343a40;
-  --light-color: #f4f4f4;
+  --primary-color: #f9813a;
+  --dark-color: #1a1c20;
+  --light-color: #fcf1f1;
   --danger-color: #dc3545;
   --success-color: #28a745;
 }
@@ -137,6 +137,7 @@ img {
   margin-right: 0.5rem;
   transition: opacity 0.2s ease-in;
   outline: none;
+  border-radius: 0.4rem;
 }
 
 .badge {

@@ -28,7 +28,7 @@ const Dashboard = ({
       Welcome { user && user.name }
     </p>
 
-    { profile == null ? 
+    { profile === null ? 
       <Fragment>
         <p>You have not yet set up your profile</p>
         <Link to="/create-profile" className="btn btn-primary my-1">
